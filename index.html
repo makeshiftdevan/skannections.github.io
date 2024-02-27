@@ -535,19 +535,19 @@ function populateGridForLevel() {
     // Determine the set of correct answers and all options based on the current level
     switch (currentLevel) {
         case 1:
-            correctAnswers = currentSituation.strategies.slice(0, 4);
+            correctAnswers = currentSituation.strategies.slice(0, 3);
             allOptions = optionsForStrategies.slice(); // Create a copy of the array
             break;
         case 2:
-            correctAnswers = currentSituation.diagrams.slice(0, 4);
+            correctAnswers = currentSituation.diagrams.slice(0, 3);
             allOptions = optionsForDiagrams.slice(); // Create a copy of the array
             break;
         case 3:
-            correctAnswers = currentSituation.variables.slice(0, 4);
+            correctAnswers = currentSituation.variables.slice(0, 3);
             allOptions = optionsForVariables.slice(); // Create a copy of the array
             break;
         case 4:
-            correctAnswers = currentSituation.equations.slice(0, 4);
+            correctAnswers = currentSituation.equations.slice(0, 3);
             allOptions = optionsForEquations.slice(); // Create a copy of the array
             break;
     }
