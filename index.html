@@ -588,7 +588,7 @@ function handleCellClick(item, cell, isCorrect) {
         points += 100;
         correctSelections++;
         console.log("Correct selection, Current selections: ", correctSelections);
-        if (correctSelections === 3) {
+        if (correctSelections === 4) {
             correctSelections = 0;
             currentLevel++;
             console.log("Advancing to next level: ", currentLevel);
@@ -599,8 +599,10 @@ function handleCellClick(item, cell, isCorrect) {
                 // Optionally, you could reload here if it's necessary to reset the game state entirely.
                 // window.location.reload();
             }
-            populateGridForLevel(); // Ensure this function is correctly advancing the level without reloading.
+            
         }
+        populateGridForLevel(); // Ensure this function is correctly advancing the level without reloading.
+    }
     } else {
         cell.classList.add("incorrect");
         setTimeout(() => cell.classList.remove("incorrect"), 500);
