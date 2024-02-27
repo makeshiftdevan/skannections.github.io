@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skanections</title>
+    <style>
+    
+        body { font-family: Arial, sans-serif; }
+        .container { text-align: center; margin-top: 20px; }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px; height: 50px; /* Adjusted for demonstration */
+            background-color: rgb(183, 45, 186);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 14px; /* Adjusted for space */
+            cursor: pointer;
+            border: 1px solid #fff; /* Added for visibility */
+        }
+        .cell.correct { background-color: rgb(36, 232, 6); }
+        .cell.incorrect {
+            background-color: rgb(224, 33, 75);
+            animation: shake 0.3s ease-in-out 0s infinite;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+    </style>
+</head>
+<body oncopy="return false;" oncut="return false;" onpaste="return false;" oncontextmenu="return false;">
+    <div class="container">
+        <h1>Skannections</h1>
+        <div id="situation-description"></div>
+        <p id="directions">Create 4 groups of 4</p>
+        <div class="game-board"></div>
+        <p id="score">Score: 0</p>
+    </div>
+    <script>
+
+    
+
+    const physicsSituations = [
+    {
+        description: "An object in free fall near the surface of the Earth",
+        diagrams: ["U_g", "v", "a", "F_{net}"],
+        strategies: ["kinematics", "forces", "conservation of energy", "free fall"],
+        variables: ["time", "acceleration", "velocity", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A block sliding down an inclined plane",
+        diagrams: ["U_g", "a", "F_{net}", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["force", "mass", "acceleration", "angle"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A simple pendulum in motion",
+        diagrams: ["U_g", "p", "ω", "Vectors"],
+        strategies: ["simple harmonic motion", "kinematics", "conservation of energy", "conservation of angular momentum"],
+        variables: ["period", "amplitude", "velocity", "angle"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "An object attached to a spring oscillating",
+    diagrams: ["U_s", "K_t", "F_{net}", "Vectors"],
+        strategies: ["simple harmonic motion", "forces", "conservation of energy", "work-energy theorem"],
+        variables: ["period", "amplitude", "force", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Two objects in inelastic collision",
+        diagrams: ["p", "F_{net}", "Collision\\ Detector", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["momentum", "mass", "velocity", "force"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Two objects elastic collision",
+        diagrams: ["p", "Collision\\ Detector", "Vectors", "K_t"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["momentum", "mass", "velocity", "force"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A car moving with constant velocity",
+        diagrams: ["v", "a", "F_{net}", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rocket launching into space",
+        diagrams: ["U_G", "v", "a", "F_{net}"],
+        strategies: ["orbital mechanics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["velocity", "force", "mass", "time"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A satellite in orbit",
+        diagrams: ["U_G", "v", "a", "L"],
+        strategies: ["orbital mechanics", "kinematics", "conservation of energy", "conservation of angular momentum"],
+        variables: ["velocity", "radius", "mass", "period"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A pulley system with masses",
+        diagrams: ["U_g", "F_{net}", "τ", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["force", "mass", "acceleration", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A block on a rough surface with friction",
+        diagrams: ["U_g", "F_{net}", "Vectors", "a"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["force", "mass", "acceleration", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A ball rolling down a ramp",
+        diagrams: ["U_g", "K_t", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "angular kinematics"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A mass attached to a string swung in a circle",
+        diagrams: ["v", "F_{net}", "ω", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["velocity", "radius", "mass", "centripetal force"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "An object sliding down a frictionless incline",
+        diagrams: ["U_g", "K_t", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "work-energy theorem"],
+        variables: ["time", "acceleration", "velocity", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A projectile launched at an angle",
+        diagrams: ["U_g", "v", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "free fall"],
+        variables: ["time", "launch angle", "velocity", "range"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A block on a rotating turntable",
+        diagrams: ["K_r", "F_{net}", "ω", "Vectors"],
+        strategies: ["forces", "angular kinematics", "forces", "work-energy theorem"],
+        variables: ["radius", "angular velocity", "centripetal force", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rolling hoop",
+        diagrams: ["K_r", "v", "F_{net}", "Vectors"],
+        strategies: ["forces", "torque", "conservation of energy", "conservation of angular momentum"],
+        variables: ["angular velocity", "moment of inertia", "angular momentum", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "2 spinning disks colliding",
+        diagrams: ["L", "K_r", "Collision\\ Detector", "Vectors"],
+        strategies: ["angular kinematics", "torque", "conservation of energy", "conservation of angular momentum"],
+        variables: ["angular velocity", "moment of inertia", "angular momentum", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating space station",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["angular kinematics", "forces", "conservation of energy", "conservation of angular momentum"],
+        variables: ["angular velocity", "radius", "centripetal force", "period"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A lever system",
+        diagrams: ["τ", "F_{net}", "p", "Vectors"],
+        strategies: ["torque", "angular kinematics", "forces", "angular kinematics"],
+        variables: ["lever arm", "force", "torque", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating merry-go-round",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["forces", "angular kinematics", "torque", "conservation of angular momentum"],
+        variables: ["radius", "angular velocity", "centripetal force", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A roller coaster loop",
+        diagrams: ["U_g", "K_t", "F_{net}", "Vectors"],
+        strategies: ["forces", "conservation of energy", "conservation of angular momentum", "angular kinematics"],
+        variables: ["radius", "velocity", "centripetal force", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A block on an inclined plane with friction",
+        diagrams: ["U_g", "K_t", "F_{net}", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "work-energy theorem"],
+        variables: ["force", "mass", "acceleration", "distance", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A pendulum experiencing air resistance",
+        diagrams: ["U_g", "p", "a", "Vectors"],
+        strategies: ["simple harmonic motion", "forces", "conservation of energy", "work-energy theorem"],
+        variables: ["period", "amplitude", "velocity", "air resistance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A person swinging on a playground swing",
+        diagrams: ["U_g", "v", "F_{net}", "Vectors"],
+        strategies: ["simple harmonic motion", "forces", "conservation of energy", "conservation of angular momentum"],
+        variables: ["period", "amplitude", "velocity", "displacement"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A person lifting a weight with a pulley system",
+        diagrams: ["U_g", "F_{net}", "τ", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "conservation of angular momentum"],
+        variables: ["force", "mass", "acceleration", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A Ferris wheel in motion",
+        diagrams: ["U_g", "v", "F_{net}", "ω"],
+        strategies: ["forces", "angular kinematics", "conservation of energy", "conservation of angular momentum"],
+        variables: ["radius", "angular velocity", "centripetal force", "period"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating platform with a spinning top",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["conservation of angular momentum", "torque", "conservation of energy", "forces"],
+        variables: ["angular velocity", "moment of inertia", "angular momentum", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A satellite undergoing an orbital maneuver",
+    diagrams: ["U_G", "v", "a", "L"],
+        strategies: ["orbital mechanics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["velocity", "force", "mass", "period"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A gymnast performing a somersault",
+        diagrams: ["K_t", "L", "F_{net}", "Vectors"],
+        strategies: ["angular kinematics", "forces", "conservation of energy", "conservation of angular momentum"],
+        variables: ["angular velocity", "radius", "torque", "moment of inertia"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating ceiling fan",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["conservation of angular momentum", "torque", "conservation of energy", "angular kinematics"],
+        variables: ["angular velocity", "moment of inertia", "rotational energy", "period"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating door with a person pushing it",
+        diagrams: ["τ", "L", "F_{net}", "Vectors"],
+        strategies: ["torque", "angular kinematics", "forces", "conservation of energy"],
+        variables: ["lever arm", "force", "torque", "angular velocity"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A satellite experiencing a gravitational slingshot",
+        diagrams: ["U_G", "v", "a", "L"],
+        strategies: ["orbital mechanics", "kinematics", "conservation of energy", "conservation of angular momentum"],
+        variables: ["velocity", "force", "radius", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A spinning ice skater pulling in their arms",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["conservation of angular momentum", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["angular velocity", "moment of inertia", "angular momentum", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "A rotating merry-go-round with adjustable speed",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["conservation of angular momentum", "angular kinematics", "forces", "conservation of energy"],
+        variables: ["radius", "angular velocity", "centripetal force", "friction"],
+    },
+    {
+        description: "Kicking a soccer ball",
+        diagrams: ["p, K_t, F_{net}, Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Pushing a friend on a swing",
+        diagrams: ["U_g", "v", "F_{net}", "Vectors"],
+        strategies: ["simple harmonic motion", "forces", "conservation of energy", "angular kinematics"],
+        variables: ["period", "amplitude", "velocity", "displacement"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Riding a bike uphill",
+        diagrams: ["U_g", "K_t", "F_{net}", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "angular kinematics"],
+        variables: ["force", "mass", "acceleration", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Throwing a ball in the air",
+        diagrams: ["U_g", "v", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "free fall"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Sliding down a snow-covered hill",
+        diagrams: ["U_g", "K_t", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Bouncing a basketball",
+        diagrams: ["U_g", "K_t", "p", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Rollerblading on a smooth surface",
+        diagrams: ["v", "a", "F_{net}", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of angular momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Using a seesaw at the playground",
+        diagrams: ["τ", "FBD", "F_{net}", "p"],
+        strategies: ["torque", "angular kinematics", "forces", "kinematics"],
+        variables: ["lever arm", "force", "torque", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Launching a water rocket",
+        diagrams: ["F_{net}", "m", "v", "Distance"],
+        strategies: ["forces", "kinematics", "conservation of energy", "conservation of momentum"],
+        variables: ["force", "mass", "velocity", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Climbing a ladder",
+        diagrams: ["F_{net}", "m", "a", "Distance"],
+        strategies: ["forces", "kinematics", "conservation of energy", "torque"],
+        variables: ["force", "mass", "acceleration", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Swimming in a pool",
+        diagrams: ["F_{net}", "m", "v", "Distance"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["force", "mass", "velocity", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Sitting on a swing at its lowest point",
+        diagrams: ["U_g", "v", "F_{net}", "Vectors"],
+        strategies: ["forces", "angular kinematics", "simple harmonic motion", "conservation of energy"],
+        variables: ["radius", "angular velocity", "centripetal force", "velocity"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Turning a corner while driving",
+        diagrams: ["v", "F_{net}", "FBD", "Vectors"],
+        strategies: ["forces", "kinematics", "conservation of energy", "angular kinematics"],
+        variables: ["radius", "velocity", "centripetal force", "friction"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Dropping a pencil to the floor",
+        diagrams: ["U_g", "v", "a", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "acceleration", "velocity", "distance"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Opening and closing a door",
+        diagrams: ["τ", "FBD", "F_{net}", "Vectors"],
+        strategies: ["torque", "angular kinematics", "forces", "conservation of energy"],
+        variables: ["lever arm", "force", "torque", "mass"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Turning a key in a lock",
+        diagrams: ["τ", "FBD", "F_{net}", "L"],
+        strategies: ["torque", "angular kinematics", "forces", "conservation of angular momentum"],
+        variables: ["lever arm", "force", "torque", "moment of inertia"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Playing on a merry-go-round",
+        diagrams: ["K_r", "L", "F_{net}", "Vectors"],
+        strategies: ["forces", "angular kinematics", "torque", "conservation of angular momentum"],
+        variables: ["radius", "angular velocity", "centripetal force", "moment if inertia"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    },
+    {
+        description: "Using a skateboard on a ramp",
+        diagrams: ["U_g", "K_t", "F_{net}", "Vectors"],
+        strategies: ["kinematics", "forces", "conservation of energy", "conservation of momentum"],
+        variables: ["time", "velocity", "distance", "acceleration"],
+        Equations: ["U(g) = K", "h=1/2at^2", "v = sqrt(2gh)", "mg = ma" ]
+    }
+        ];
+        const optionsForStrategies = [
+             "acceleration",
+            "fluid dynamics",
+           "thermodynamics",
+            "waves",
+            "special relativity",
+            "particle physics",
+            "refraction",
+            "law of reflection",
+            "calorimetry",
+            "algebraic malfeasance",
+            "nuclear decay",
+            "conservation of lepton number",
+            "conservation of lepton generation",
+            "conservation of baryon number",
+            "fluid statics",
+            "sound",
+            "conservation of charge",
+            "quark confinement theory",
+            "fundamental forces",
+            "electron degeneracy pressure",
+            "scalar dot product"
+        ];
+
+        const optionsForVariables = [
+    "time",
+    "acceleration",
+    "velocity",
+    "distance",
+    "force",
+    "mass",
+    "period",
+    "amplitude",
+    "momentum",
+    "gravity",
+    "radius",
+    "friction",
+    "range",
+    "centripetal force",
+    "angular velocity",
+    "moment of inertia",
+    "angular momentum",
+    "torque",
+    "rotational energy",
+    "displacement",
+    "angle"
+];
+
+    const optionsForDiagrams = [
+    "U_g",
+    "v",
+    "a",
+    "F_{net}",
+    "Vectors",
+    "U_s",
+    "K_t"
+
+    ];
+    const optionsForEquations = [
+    "t= 2gy",
+    "a = m^2 /r",
+    "v = at^2",
+    "x = vt + 1/2at",
+    "f = ma",
+    "m = ma - mg",
+    "T = 2pi* sqrt(r)",
+    "a = Asin(wt)",
+    "m = mv",
+    "g = Gmm/r^2",
+    "r = Gm/g",
+    "F(f) = mv^2",
+    "x = vt",
+    "F(c) = ma + mg",
+    "w = mvr",
+    "I = 2/9 MR^2",
+    "L = Ivr",
+    "t = m (alpha)",
+    "K = 1/2 mr^2",
+    "k = 1/2 Ir^2",
+    "s = xr"
+];
+        let points = 0, currentLevel = 1, correctSelections = 0, currentSituation = null;
+
+        function selectRandomSituation() {
+    const randomIndex = Math.floor(Math.random() * physicsSituations.length);
+    currentSituation = physicsSituations[randomIndex];
+    console.log("Selected Random Situation: ", currentSituation);
+    document.getElementById("situation-description").textContent = currentSituation.description;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    console.log("Shuffled Array: ", array);
+}
+
+function updateScore() {
+    document.getElementById("score").textContent = `Score: ${points}`;
+    console.log("Updated Score: ", points);
+}
+
+function populateGridForLevel() {
+    console.log("Clearing grid for new level...");
+    const gameBoard = document.querySelector(".game-board");
+    gameBoard.innerHTML = ''; // Ensure grid is cleared before populating
+
+    console.log("Populating grid for level:", currentLevel);
+
+    let correctAnswers = [];
+    let allOptions = [];
+
+    // Determine the set of correct answers and all options based on the current level
+    switch (currentLevel) {
+        case 1:
+            correctAnswers = currentSituation.strategies.slice(0, 4);
+            allOptions = optionsForStrategies.slice(); // Create a copy of the array
+            break;
+        case 2:
+            correctAnswers = currentSituation.diagrams.slice(0, 4);
+            allOptions = optionsForDiagrams.slice(); // Create a copy of the array
+            break;
+        case 3:
+            correctAnswers = currentSituation.variables.slice(0, 4);
+            allOptions = optionsForVariables.slice(); // Create a copy of the array
+            break;
+        case 4:
+            correctAnswers = currentSituation.equations.slice(0, 4);
+            allOptions = optionsForEquations.slice(); // Create a copy of the array
+            break;
+    }
+
+    // Ensure a mix of correct and incorrect options, filling up to 16 cells
+    let mixedOptions = [...correctAnswers];
+    while (mixedOptions.length < 16) {
+        let option = allOptions[Math.floor(Math.random() * allOptions.length)];
+        if (!mixedOptions.includes(option)) {
+            mixedOptions.push(option);
+        }
+    }
+
+    shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
+
+    if (mixedOptions.length === 0) {
+        console.error("No options to populate the grid!");
+        return; // Early return to avoid further errors if mixedOptions is empty
+    }
+
+    // Populate the grid with cells based on mixedOptions
+    mixedOptions.forEach(item => {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = item;
+        cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
+        gameBoard.appendChild(cell);
+    });
+
+    console.log("Grid populated with items: ", mixedOptions.length);
+}
+
+function handleCellClick(item, cell, isCorrect) {
+    console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
+    
+    if (isCorrect) {
+        cell.classList.add("correct");
+        points += 100;
+        correctSelections++;
+        console.log("Correct selection, Current selections: ", correctSelections);
+        if (correctSelections === 4) {
+            correctSelections = 0;
+            currentLevel++;
+            console.log("Advancing to next level: ", currentLevel);
+            if (currentLevel > 4) {
+                alert("Congratulations, you've completed the game!");
+                currentLevel = 1; // Reset level
+                console.log("Game reset to level 1");
+                // Optionally, you could reload here if it's necessary to reset the game state entirely.
+                // window.location.reload();
+            }
+            populateGridForLevel(); // Ensure this function is correctly advancing the level without reloading.
+        }
+    } else {
+        cell.classList.add("incorrect");
+        setTimeout(() => cell.classList.remove("incorrect"), 500);
+        points -= 50;
+    }
+    updateScore();
+}
+
+window.onload = function() {
+    console.log("Game initializing...");
+    selectRandomSituation();
+    populateGridForLevel();
+    updateScore();
+};
+</script>
