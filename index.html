@@ -588,7 +588,7 @@ function handleCellClick(item, cell, isCorrect) {
         points += 100;
         correctSelections++;
         console.log("Correct selection, Current selections: ", correctSelections);
-        if (correctSelections === 5) {
+        if (correctSelections === 3) {
             correctSelections = 0;
             currentLevel++;
             console.log("Advancing to next level: ", currentLevel);
