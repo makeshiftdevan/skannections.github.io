@@ -524,6 +524,9 @@ function updateScore() {
 }
 
 function populateGridForLevel() {
+    setTimeout(() => {
+          console.log('This message is shown after a 0.5-second delay.');
+        }, 500);
     console.log("Clearing grid for new level...");
     const gameBoard = document.querySelector(".game-board");
     gameBoard.innerHTML = ''; // Ensure grid is cleared before populating
@@ -593,19 +596,23 @@ function handleCellClick(item, cell, isCorrect) {
         setTimeout(() => {
           console.log('This message is shown after a 2-second delay.');
         }, 2000);
-
-console.log('This message is shown immediately after the first message, without waiting for the timeout.');
+        
         if (correctSelections === 4) {
             correctSelections = 0;
             currentLevel++;
+            setTimeout(() => {
+          console.log('This message is shown after a 1-second delay.');
+        }, 1000);
             console.log("Advancing to next level: ", currentLevel);
             if (currentLevel > 4) {
                 alert("Congratulations, you've completed the game!");
                 currentLevel = 1; // Reset level
                 console.log("Game reset to level 1");
-                // Optionally, you could reload here if it's necessary to reset the game state entirely.
-                // window.location.reload();
+                window.location.reload();
             }
+            setTimeout(() => {
+          console.log('This message is shown after a 2-second delay.');
+        }, 2000);
              populateGridForLevel(); // Ensure this function is correctly advancing the level without reloading.
         }
     
