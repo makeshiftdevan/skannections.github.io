@@ -598,9 +598,11 @@ function handleCellClick(item, cell, isCorrect) {
     if (isCorrect) {
         cell.classList.add("correct");
         points += 100;
+        setTimeout(() => {
+          console.log('This message is shown after a 2-second delay.');
+        }, 2000);
         correctSelections++;
         console.log("Correct selection, Current selections: ", correctSelections);
-        console.log('This message is shown first.');
         setTimeout(() => {
           console.log('This message is shown after a 2-second delay.');
         }, 2000);
