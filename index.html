@@ -598,41 +598,35 @@ function handleCellClick(item, cell, isCorrect) {
     if (isCorrect) {
         cell.classList.add("correct");
         points += 100;
-        setTimeout(() => {
-          console.log('This message is shown after a 2-second delay.');
-        }, 2000);
         correctSelections++;
         console.log("Correct selection, Current selections: ", correctSelections);
-        setTimeout(() => {
-          console.log('This message is shown after a 2-second delay.');
-        }, 2000);
-        
+
         if (correctSelections === 4) {
-             setTimeout(() => {
-             console.log('This message is shown after a 1-second delay.');
-        }, 1000);
-            correctSelections = 0;
-            currentLevel++;
+            // Wait for 2 seconds after the fourth correct answer
             setTimeout(() => {
-             console.log('This message is shown after a 1-second delay.');
-        }, 1000);
-            console.log("Advancing to next level: ", currentLevel);
-            if (currentLevel > 4) {
-                alert("Congratulations, you've completed the game!");
-                currentLevel = 1; // Reset level
-                console.log("Game reset to level 1");
-                window.location.reload();
-            }
-            setTimeout(() => {
-          console.log('This message is shown after a 2-second delay.');
-        }, 2000);
-             populateGridForLevel(); // Ensure this function is correctly advancing the level without reloading.
+                // This code will run after a 2-second delay
+                correctSelections = 0; // Reset correct selections for the next level
+                currentLevel++; // Advance to the next level
+                console.log("Advancing to next level: ", currentLevel);
+                
+                if (currentLevel > 4) {
+                    alert("Congratulations, you've completed the game!");
+                    currentLevel = 1; // Reset level
+                    console.log("Game reset to level 1");
+                    window.location.reload(); // Reload the page to start over
+                } else {
+                    // Clear the board and populate for the next level
+                    populateGridForLevel();
+                }
+                updateScore(); // Update the score display
+            }, 2000); // 2000 milliseconds delay
         }
     
     } else {
         cell.classList.add("incorrect");
+        // Remove the incorrect class after 500ms to "reset" the cell's appearance
         setTimeout(() => cell.classList.remove("incorrect"), 500);
-        points -= 50;
+        points -= 50; // Deduct points for incorrect selection
     }
     updateScore();
 }
