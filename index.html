@@ -598,10 +598,13 @@ function handleCellClick(item, cell, isCorrect) {
         }, 2000);
         
         if (correctSelections === 4) {
+             setTimeout(() => {
+             console.log('This message is shown after a 1-second delay.');
+        }, 1000);
             correctSelections = 0;
             currentLevel++;
             setTimeout(() => {
-          console.log('This message is shown after a 1-second delay.');
+             console.log('This message is shown after a 1-second delay.');
         }, 1000);
             console.log("Advancing to next level: ", currentLevel);
             if (currentLevel > 4) {
