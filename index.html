@@ -10,31 +10,33 @@
         body { font-family: Arial, sans-serif, -webkit-text-size-adjust: 100%; /* Safari on iOS, Firefox for Android */
     text-size-adjust: 100%; /* Default for browsers that support it */}
         .container { text-align: center; margin-top: 20px; }
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        
-        mask-image: url('mask.png');
-        min-width: -moz-fit-content;
-        min-width: fit-content;
-        width: -moz-fit-content;
-        width: fit-content;
+     .game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
 
-    width: calc(25% - 20px); /* Assuming 4 cells per row, subtract the gap */
-    height: 150px; /* Adjust based on your content or leave as a fixed height */
+.cell {
+    width: calc(100% - 20px); /* Assuming 4 cells per row, subtract the gap */
+    height: 150px;
     background-color: rgb(183, 45, 186);
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 14px;
     cursor: pointer;
-    border: 1px solid #fff; /* Added for visibility */
-    margin: 10px; /* Adjust based on your grid gap preference */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    transition: transform 0.2s; /* Smooth transition for hover effect */
+    border: 1px solid #fff;
+    margin: 10px;
+    box-sizing: border-box;
+    transition: transform 0.2s;
 }
+
+.cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 
 .cell:hover {
     /* Slightly scale up the cell on hover for a nice interactive effect */
@@ -543,89 +545,95 @@ function updateScore() {
 }
 
 function populateGridForLevel() {
-    console.log("Preparing to clear grid for new level...");
+    console.log("Adding new grid for level...");
 
-    // Delay the clearing and repopulating of the grid to allow for animations or other actions to complete
-    setTimeout(() => {
-        const gameBoard = document.querySelector(".game-board");
-        gameBoard.innerHTML = ''; // Clear the grid before repopulating
-        console.log('Grid cleared. Now repopulating for new level...');
+    const container = document.querySelector(".container");
 
-        // Determine the set of correct answers and all options based on the current level
-        let correctAnswers = [];
-        let allOptions = [];
-        switch (currentLevel) {
-            case 1:
-                correctAnswers = currentSituation.strategies.slice(0, 4);
-                allOptions = optionsForStrategies.slice(); // Create a copy of the array
-                break;
-            case 2:
-                correctAnswers = currentSituation.diagrams.slice(0, 4);
-                allOptions = optionsForDiagrams.slice(); // Create a copy of the array
-                break;
-            case 3:
-                correctAnswers = currentSituation.variables.slice(0, 4);
-                allOptions = optionsForVariables.slice(); // Create a copy of the array
-                break;
-            case 4:
-                correctAnswers = currentSituation.equations.slice(0, 4);
-                allOptions = optionsForEquations.slice(); // Create a copy of the array
-                break;
+    // Create a level header
+    const levelHeader = document.createElement("h2");
+    levelHeader.textContent = `Level ${currentLevel}`;
+    container.appendChild(levelHeader);
+
+    // Create a new game board for the level
+    const newGameBoard = document.createElement("div");
+    newGameBoard.classList.add("game-board");
+    container.appendChild(newGameBoard);
+
+    // Determine the set of correct answers and all options based on the current level
+    let correctAnswers = [];
+    let allOptions = [];
+    switch (currentLevel) {
+        case 1:
+            correctAnswers = currentSituation.strategies.slice(0, 4);
+            allOptions = optionsForStrategies.slice(); // Create a copy of the array
+            break;
+        case 2:
+            correctAnswers = currentSituation.diagrams.slice(0, 4);
+            allOptions = optionsForDiagrams.slice(); // Create a copy of the array
+            break;
+        case 3:
+            correctAnswers = currentSituation.variables.slice(0, 4);
+            allOptions = optionsForVariables.slice(); // Create a copy of the array
+            break;
+        case 4:
+            correctAnswers = currentSituation.equations.slice(0, 4);
+            allOptions = optionsForEquations.slice(); // Create a copy of the array
+            break;
+    }
+
+    // Ensure a mix of correct and incorrect options, filling up to 16 cells
+    let mixedOptions = [...correctAnswers];
+    while (mixedOptions.length < 16) {
+        let option = allOptions[Math.floor(Math.random() * allOptions.length)];
+        if (!mixedOptions.includes(option)) {
+            mixedOptions.push(option);
         }
+    }
 
-        // Ensure a mix of correct and incorrect options, filling up to 16 cells
-        let mixedOptions = [...correctAnswers];
-        while (mixedOptions.length < 16) {
-            let option = allOptions[Math.floor(Math.random() * allOptions.length)];
-            if (!mixedOptions.includes(option)) {
-                mixedOptions.push(option);
-            }
-        }
+    shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
 
-        shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
+    mixedOptions.forEach(item => {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = item;
+        cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
+        newGameBoard.appendChild(cell);
+    });
 
-        if (mixedOptions.length === 0) {
-            console.error("No options to populate the grid!");
-            return; // Early return to avoid further errors if mixedOptions is empty
-        }
-console.log("mixedOptions contents:", mixedOptions);
-
-mixedOptions.forEach(item => {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.textContent = item;
-    cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
-    gameBoard.appendChild(cell);
-});
-     
-
-        console.log("Grid populated with items: ", mixedOptions.length);
-    }, 2000); // This delay ensures that the clearing and repopulating process waits for 2 seconds before proceeding
+    console.log("Grid for level " + currentLevel + " populated with items.");
 }
 
+   
 
 function handleCellClick(item, cell, isCorrect) {
     console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
-    
+
+    // Remove any existing correct/incorrect classes
+    cell.classList.remove("correct", "incorrect");
+
     if (isCorrect) {
-    cell.classList.add("correct");
-    points += 100;
-    correctSelections++;
-    if (correctSelections === 4) {
-        setTimeout(() => {
-            correctSelections = 0;
-            currentLevel++;
-            if (currentLevel > 4) {
-                alert("Congratulations, you've completed the game!");
-                currentLevel = 1;
-                window.location.reload();
-            } else {
-                populateGridForLevel();
-            }
-            updateScore();
-        }, 2000); // Wait 2 seconds before proceeding
+        cell.classList.add("correct");
+        points += 100;
+        correctSelections++;
+        if (correctSelections === 4) {
+            setTimeout(() => {
+                correctSelections = 0;
+                currentLevel++;
+                if (currentLevel > 4) {
+                    alert("Congratulations, you've completed the game!");
+                    currentLevel = 1;
+                    window.location.reload(); // Restart the game
+                } else {
+                    populateGridForLevel(); // Populate for the next level
+                }
+                updateScore();
+            }, 2000); // Wait 2 seconds before proceeding to next actions
+        }
+    } else {
+        cell.classList.add("incorrect");
+        points -= 50;
     }
-}}
+}
 
 window.onload = function() {
     console.log("Game initializing...");
