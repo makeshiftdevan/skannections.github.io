@@ -532,66 +532,65 @@ function updateScore() {
 }
 
 function populateGridForLevel() {
-    console.log("Clearing grid for new level...");
+    console.log("Preparing to clear grid for new level...");
+
+    // Delay the clearing and repopulating of the grid to allow for animations or other actions to complete
     setTimeout(() => {
-    const gameBoard = document.querySelector(".game-board");
-    gameBoard.innerHTML = ''; // Ensure grid is cleared before populatin
-          console.log('This message is shown after a 0.5-second delay.');
-        }, 2000);
-    
+        const gameBoard = document.querySelector(".game-board");
+        gameBoard.innerHTML = ''; // Clear the grid before repopulating
+        console.log('Grid cleared. Now repopulating for new level...');
 
-    console.log("Populating grid for level:", currentLevel);
-
-    let correctAnswers = [];
-    let allOptions = [];
-
-    // Determine the set of correct answers and all options based on the current level
-    switch (currentLevel) {
-        case 1:
-            correctAnswers = currentSituation.strategies.slice(0, 4);
-            allOptions = optionsForStrategies.slice(); // Create a copy of the array
-            break;
-        case 2:
-            correctAnswers = currentSituation.diagrams.slice(0, 4);
-            allOptions = optionsForDiagrams.slice(); // Create a copy of the array
-            break;
-        case 3:
-            correctAnswers = currentSituation.variables.slice(0, 4);
-            allOptions = optionsForVariables.slice(); // Create a copy of the array
-            break;
-        case 4:
-            correctAnswers = currentSituation.equations.slice(0, 4);
-            allOptions = optionsForEquations.slice(); // Create a copy of the array
-            break;
-    }
-
-    // Ensure a mix of correct and incorrect options, filling up to 16 cells
-    let mixedOptions = [...correctAnswers];
-    while (mixedOptions.length < 16) {
-        let option = allOptions[Math.floor(Math.random() * allOptions.length)];
-        if (!mixedOptions.includes(option)) {
-            mixedOptions.push(option);
+        // Determine the set of correct answers and all options based on the current level
+        let correctAnswers = [];
+        let allOptions = [];
+        switch (currentLevel) {
+            case 1:
+                correctAnswers = currentSituation.strategies.slice(0, 4);
+                allOptions = optionsForStrategies.slice(); // Create a copy of the array
+                break;
+            case 2:
+                correctAnswers = currentSituation.diagrams.slice(0, 4);
+                allOptions = optionsForDiagrams.slice(); // Create a copy of the array
+                break;
+            case 3:
+                correctAnswers = currentSituation.variables.slice(0, 4);
+                allOptions = optionsForVariables.slice(); // Create a copy of the array
+                break;
+            case 4:
+                correctAnswers = currentSituation.equations.slice(0, 4);
+                allOptions = optionsForEquations.slice(); // Create a copy of the array
+                break;
         }
-    }
 
-    shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
+        // Ensure a mix of correct and incorrect options, filling up to 16 cells
+        let mixedOptions = [...correctAnswers];
+        while (mixedOptions.length < 16) {
+            let option = allOptions[Math.floor(Math.random() * allOptions.length)];
+            if (!mixedOptions.includes(option)) {
+                mixedOptions.push(option);
+            }
+        }
 
-    if (mixedOptions.length === 0) {
-        console.error("No options to populate the grid!");
-        return; // Early return to avoid further errors if mixedOptions is empty
-    }
+        shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
 
-    // Populate the grid with cells based on mixedOptions
-    mixedOptions.forEach(item => {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.textContent = item;
-        cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
-        gameBoard.appendChild(cell);
-    });
+        if (mixedOptions.length === 0) {
+            console.error("No options to populate the grid!");
+            return; // Early return to avoid further errors if mixedOptions is empty
+        }
 
-    console.log("Grid populated with items: ", mixedOptions.length);
+        // Populate the grid with cells based on mixedOptions
+        mixedOptions.forEach(item => {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.textContent = item;
+            cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
+            gameBoard.appendChild(cell);
+        });
+
+        console.log("Grid populated with items: ", mixedOptions.length);
+    }, 2000); // This delay ensures that the clearing and repopulating process waits for 2 seconds before proceeding
 }
+
 
 function handleCellClick(item, cell, isCorrect) {
     console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
