@@ -606,9 +606,11 @@ function handleCellClick(item, cell, isCorrect) {
             setTimeout(() => {
                 // This code will run after a 2-second delay
                 correctSelections = 0; // Reset correct selections for the next level
+                 setTimeout(() => {
                 currentLevel++; // Advance to the next level
                 console.log("Advancing to next level: ", currentLevel);
-                
+                }, 2000); // 2000 milliseconds delay
+        
                 if (currentLevel > 4) {
                     alert("Congratulations, you've completed the game!");
                     currentLevel = 1; // Reset level
