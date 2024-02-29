@@ -22,11 +22,6 @@
         width: -moz-fit-content;
         width: fit-content;
 
-
-        .cell {/* Assuming your .cell class might benefit from mask-image */
-    -webkit-mask-image: url('mask.png'); /* Chrome, Chrome Android, Edge */
-    mask-image: url('mask.png'); /* Standard syntax for browsers that support it */
-    /* Use percentages or viewport units for width and height to make the cells responsive */
     width: calc(25% - 20px); /* Assuming 4 cells per row, subtract the gap */
     height: 150px; /* Adjust based on your content or leave as a fixed height */
     background-color: rgb(183, 45, 186);
@@ -593,15 +588,16 @@ function populateGridForLevel() {
             console.error("No options to populate the grid!");
             return; // Early return to avoid further errors if mixedOptions is empty
         }
+console.log("mixedOptions contents:", mixedOptions);
 
-        // Populate the grid with cells based on mixedOptions
-        mixedOptions.forEach(item => {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-            cell.textContent = item;
-            cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
-            gameBoard.appendChild(cell);
-        });
+mixedOptions.forEach(item => {
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.textContent = item;
+    cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
+    gameBoard.appendChild(cell);
+});
+     
 
         console.log("Grid populated with items: ", mixedOptions.length);
     }, 2000); // This delay ensures that the clearing and repopulating process waits for 2 seconds before proceeding
