@@ -517,12 +517,7 @@
     console.log("Selected Random Situation: ", currentSituation);
     document.getElementById("situation-description").textContent = currentSituation.description;
 }
-function selectRandomSituation() {
-    const randomIndex = Math.floor(Math.random() * physicsSituations.length);
-    currentSituation = physicsSituations[randomIndex];
-    console.log("Selected Random Situation: ", currentSituation);
-    document.getElementById("situation-description").textContent = currentSituation.description;
-}
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -537,13 +532,13 @@ function updateScore() {
 }
 
 function populateGridForLevel() {
+    console.log("Clearing grid for new level...");
     setTimeout(() => {
-        console.log("Clearing grid for new level...");
     const gameBoard = document.querySelector(".game-board");
     gameBoard.innerHTML = ''; // Ensure grid is cleared before populatin
           console.log('This message is shown after a 0.5-second delay.');
-        }, 500);
-    g
+        }, 2000);
+    
 
     console.log("Populating grid for level:", currentLevel);
 
@@ -602,41 +597,23 @@ function handleCellClick(item, cell, isCorrect) {
     console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
     
     if (isCorrect) {
-        cell.classList.add("correct");
-        points += 100;
-        correctSelections++;
-        console.log("Correct selection, Current selections: ", correctSelections);
-
-        if (correctSelections === 4) {
-            // Wait for 2 seconds after the fourth correct answer
-            setTimeout(() => {
-                // This code will run after a 2-second delay
-                correctSelections = 0; // Reset correct selections for the next level
-                 setTimeout(() => {
-                currentLevel++; // Advance to the next level
-                console.log("Advancing to next level: ", currentLevel);
-                }, 2000); // 2000 milliseconds delay
-        
-                if (currentLevel > 4) {
-                    alert("Congratulations, you've completed the game!");
-                    currentLevel = 1; // Reset level
-                    console.log("Game reset to level 1");
-                    window.location.reload(); // Reload the page to start over
-                } else {
-                    // Clear the board and populate for the next level
-                    populateGridForLevel();
-                }
-                updateScore(); // Update the score display
-            }, 2000); // 2000 milliseconds delay
-        }
-    
-    } else {
-        cell.classList.add("incorrect");
-        // Remove the incorrect class after 500ms to "reset" the cell's appearance
-        setTimeout(() => cell.classList.remove("incorrect"), 500);
-        points -= 50; // Deduct points for incorrect selection
+    cell.classList.add("correct");
+    points += 100;
+    correctSelections++;
+    if (correctSelections === 4) {
+        setTimeout(() => {
+            correctSelections = 0;
+            currentLevel++;
+            if (currentLevel > 4) {
+                alert("Congratulations, you've completed the game!");
+                currentLevel = 1;
+                window.location.reload();
+            } else {
+                populateGridForLevel();
+            }
+            updateScore();
+        }, 2000); // Wait 2 seconds before proceeding
     }
-    updateScore();
 }
 
 window.onload = function() {
