@@ -14,7 +14,6 @@
             gap: 10px;
             margin-top: 20px;
         }
-        text-size-adjust: 100%;
         mask-image: url('mask.png');
         min-width: -moz-fit-content;
         min-width: fit-content;
@@ -23,13 +22,26 @@
 
 
         .cell {
-            width: 400px; height: 200px; 
-            background-color: rgb(183, 45, 186);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 14px; 
-            cursor: pointer;
-            border: 1px solid #fff; /* Added for visibility */
-        }
+    /* Use percentages or viewport units for width and height to make the cells responsive */
+    width: calc(25% - 20px); /* Assuming 4 cells per row, subtract the gap */
+    height: 150px; /* Adjust based on your content or leave as a fixed height */
+    background-color: rgb(183, 45, 186);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #fff; /* Added for visibility */
+    margin: 10px; /* Adjust based on your grid gap preference */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+}
+
+.cell:hover {
+    /* Slightly scale up the cell on hover for a nice interactive effect */
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: add a shadow effect on hover */
+}
         .cell.correct { background-color: rgb(36, 232, 6); }
         .cell.incorrect {
             background-color: rgb(224, 33, 75);
