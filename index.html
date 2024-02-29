@@ -23,10 +23,10 @@
 
 
         .cell {
-            width: 100%; height: 100%; /* Adjusted for demonstration */
+            width: 400px; height: 200px; 
             background-color: rgb(183, 45, 186);
             display: flex; justify-content: center; align-items: center;
-            font-size: 14px; /* Adjusted for space */
+            font-size: 14px; 
             cursor: pointer;
             border: 1px solid #fff; /* Added for visibility */
         }
@@ -517,7 +517,12 @@
     console.log("Selected Random Situation: ", currentSituation);
     document.getElementById("situation-description").textContent = currentSituation.description;
 }
-
+function selectRandomSituation() {
+    const randomIndex = Math.floor(Math.random() * physicsSituations.length);
+    currentSituation = physicsSituations[randomIndex];
+    console.log("Selected Random Situation: ", currentSituation);
+    document.getElementById("situation-description").textContent = currentSituation.description;
+}
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -533,11 +538,12 @@ function updateScore() {
 
 function populateGridForLevel() {
     setTimeout(() => {
+        console.log("Clearing grid for new level...");
+    const gameBoard = document.querySelector(".game-board");
+    gameBoard.innerHTML = ''; // Ensure grid is cleared before populatin
           console.log('This message is shown after a 0.5-second delay.');
         }, 500);
-    console.log("Clearing grid for new level...");
-    const gameBoard = document.querySelector(".game-board");
-    gameBoard.innerHTML = ''; // Ensure grid is cleared before populating
+    g
 
     console.log("Populating grid for level:", currentLevel);
 
