@@ -6,7 +6,8 @@
     <title>Skanections</title>
     <style>
     
-        body { font-family: Arial, sans-serif; }
+        body { font-family: Arial, sans-serif, -webkit-text-size-adjust: 100%; /* Safari on iOS, Firefox for Android */
+    text-size-adjust: 100%; /* Default for browsers that support it */}
         .container { text-align: center; margin-top: 20px; }
         .game-board {
             display: grid;
@@ -21,7 +22,9 @@
         width: fit-content;
 
 
-        .cell {
+        .cell {/* Assuming your .cell class might benefit from mask-image */
+    -webkit-mask-image: url('mask.png'); /* Chrome, Chrome Android, Edge */
+    mask-image: url('mask.png'); /* Standard syntax for browsers that support it */
     /* Use percentages or viewport units for width and height to make the cells responsive */
     width: calc(25% - 20px); /* Assuming 4 cells per row, subtract the gap */
     height: 150px; /* Adjust based on your content or leave as a fixed height */
