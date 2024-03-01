@@ -545,65 +545,67 @@ function updateScore() {
 }
 
 function populateGridForLevel() {
-    console.log("Adding new grid for level...");
+            console.log("Adding new grid for level...");
 
-    const container = document.querySelector(".container");
+            const container = document.querySelector(".container");
 
-    // Create a level header
-    const levelHeader = document.createElement("h2");
-    levelHeader.textContent = `Level ${currentLevel}`;
-    container.appendChild(levelHeader);
+            // Clear previous game board
+            const existingBoard = container.querySelector('.game-board');
+            if (existingBoard) {
+                container.removeChild(existingBoard);
+            }
 
-    // Create a new game board for the level
-    const newGameBoard = document.createElement("div");
-    newGameBoard.classList.add("game-board");
-    container.appendChild(newGameBoard);
+            // Create a new game board for the level
+            const newGameBoard = document.createElement("div");
+            newGameBoard.classList.add("game-board");
 
-    // Determine the set of correct answers and all options based on the current level
-    let correctAnswers = [];
-    let allOptions = [];
-    switch (currentLevel) {
-        case 1:
-            correctAnswers = currentSituation.strategies.slice(0, 4);
-            allOptions = optionsForStrategies.slice(); // Create a copy of the array
-            break;
-        case 2:
-            correctAnswers = currentSituation.diagrams.slice(0, 4);
-            allOptions = optionsForDiagrams.slice(); // Create a copy of the array
-            break;
-        case 3:
-            correctAnswers = currentSituation.variables.slice(0, 4);
-            allOptions = optionsForVariables.slice(); // Create a copy of the array
-            break;
-        case 4:
-            correctAnswers = currentSituation.equations.slice(0, 4);
-            allOptions = optionsForEquations.slice(); // Create a copy of the array
-            break;
-    }
+            let correctAnswers = [];
+            let allOptions = [];
+            switch (currentLevel) {
+                case 1:
+                    correctAnswers = currentSituation.strategies.slice(0, 4);
+                    allOptions = optionsForStrategies.slice();
+                    break;
+                case 2:
+                    correctAnswers = currentSituation.diagrams.slice(0, 4);
+                    allOptions = optionsForDiagrams.slice();
+                    break;
+                case 3:
+                    correctAnswers = currentSituation.variables.slice(0, 4);
+                    allOptions = optionsForVariables.slice();
+                    break;
+                case 4:
+                    correctAnswers = currentSituation.equations.slice(0, 4);
+                    allOptions = optionsForEquations.slice();
+                    break;
+                // Add cases for other levels if needed
+            }
 
-    // Ensure a mix of correct and incorrect options, filling up to 16 cells
-    let mixedOptions = [...correctAnswers];
-    while (mixedOptions.length < 16) {
-        let option = allOptions[Math.floor(Math.random() * allOptions.length)];
-        if (!mixedOptions.includes(option)) {
-            mixedOptions.push(option);
+            // Ensure a mix of correct and incorrect options
+            let mixedOptions = [...correctAnswers];
+            while (mixedOptions.length < 16) {
+                let option = allOptions[Math.floor(Math.random() * allOptions.length)];
+                if (!mixedOptions.includes(option)) {
+                    mixedOptions.push(option);
+                }
+            }
+
+            shuffleArray(mixedOptions);
+
+            mixedOptions.forEach(item => {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.textContent = item;
+                cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
+                newGameBoard.appendChild(cell);
+            });
+
+            container.appendChild(newGameBoard);
+            console.log("Grid for level " + currentLevel + " populated with items.");
         }
-    }
 
-    shuffleArray(mixedOptions); // Shuffle to ensure random placement in the grid
-
-    mixedOptions.forEach(item => {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.textContent = item;
-        cell.onclick = () => handleCellClick(item, cell, correctAnswers.includes(item));
-        newGameBoard.appendChild(cell);
-    });
-
-    console.log("Grid for level " + currentLevel + " populated with items.");
-}
-
-   
+     //newGameBoard.scrollIntoView({behavior: 'smooth'});
+        }
 
 function handleCellClick(item, cell, isCorrect) {
     console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
@@ -636,11 +638,11 @@ function handleCellClick(item, cell, isCorrect) {
 }
 
 window.onload = function() {
-    console.log("Game initializing...");
-    selectRandomSituation();
-    populateGridForLevel();
-    updateScore();
-};
+            console.log("Game initializing...");
+            selectRandomSituation();
+            populateGridForLevel();
+            updateScore();
+        };
 </script>
 </body>
 </html>
