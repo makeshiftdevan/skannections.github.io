@@ -604,7 +604,7 @@ function handleCellClick(item, cell, isCorrect) {
 
     if (isCorrect) {
         cell.classList.add("correct");
-        points += 100;
+        points += 100; // Add points for correct selection
         correctSelections++;
         if (correctSelections === 4) {
             setTimeout(() => {
@@ -617,15 +617,14 @@ function handleCellClick(item, cell, isCorrect) {
                 } else {
                     populateGridForLevel(); // Populate for the next level
                 }
-                updateScore();
             }, 2000); // Wait 2 seconds before proceeding to next actions
         }
     } else {
         cell.classList.add("incorrect");
-        points -= 50;
+        points -= 50; // Subtract points for incorrect selection
     }
+    updateScore(); // Update score immediately after each click
 }
-
 window.onload = function() {
             console.log("Game initializing...");
             selectRandomSituation();
