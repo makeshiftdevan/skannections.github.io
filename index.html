@@ -539,12 +539,22 @@ function updateScore() {
     document.getElementById("score").textContent = `Score: ${points}`;
     console.log("Updated Score: ", points);
 }
-
+function clearGameBoard() {
+    const gameBoard = document.querySelector(".game-board");
+    while (gameBoard.firstChild) {
+        gameBoard.firstChild.className = 'cell'; // Reset any class to default
+        gameBoard.removeChild(gameBoard.firstChild);
+    }
+}
 function populateGridForLevel() {
+    clearGameBoard();
+    
+    
     console.log("Populating new grid for level...");
 
     // Select the game board container
     const gameBoard = document.querySelector(".game-board");
+    
 
     // Clear existing cells from the game board
     while (gameBoard.firstChild) {
