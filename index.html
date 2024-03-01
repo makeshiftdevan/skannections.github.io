@@ -551,10 +551,14 @@ function populateGridForLevel() {
 
             // Clear previous game board
             const existingBoard = container.querySelector('.game-board');
-            if (existingBoard) {
-                container.removeChild(existingBoard);
-            }
-
+           console.log("Attempting to clear the previous game board...");
+if (existingBoard) {
+    console.log("Existing board found, removing...");
+    container.removeChild(existingBoard);
+    console.log("Existing board removed.");
+} else {
+    console.log("No existing board found.");
+}
             // Create a new game board for the level
             const newGameBoard = document.createElement("div");
             newGameBoard.classList.add("game-board");
@@ -643,5 +647,10 @@ window.onload = function() {
             updateScore();
         };
 </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialization code here
+    });
+    </script>
 </body>
 </html>
