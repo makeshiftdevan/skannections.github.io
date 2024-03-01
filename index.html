@@ -601,11 +601,10 @@ function populateGridForLevel() {
             });
 
             container.appendChild(newGameBoard);
+            //newGameBoard.scrollIntoView({behavior: 'smooth'});
             console.log("Grid for level " + currentLevel + " populated with items.");
         }
-
-     //newGameBoard.scrollIntoView({behavior: 'smooth'});
-        }
+        
 
 function handleCellClick(item, cell, isCorrect) {
     console.log(`Cell clicked: ${item}, Correct: ${isCorrect}`);
