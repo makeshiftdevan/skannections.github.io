@@ -6,43 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skanections</title>
     <style>
-    
-        body { font-family: Arial, sans-serif, -webkit-text-size-adjust: 100%; /* Safari on iOS, Firefox for Android */
-    text-size-adjust: 100%; /* Default for browsers that support it */}
-        .container { text-align: center; margin-top: 20px; }
-     .game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.cell {
-    width: calc(100% - 20px); /* Assuming 4 cells per row, subtract the gap */
-    height: 150px;
-    background-color: rgb(183, 45, 186);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    cursor: pointer;
-    border: 1px solid #fff;
-    margin: 10px;
-    box-sizing: border-box;
-    transition: transform 0.2s;
-}
-
-.cell:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-
-.cell:hover {
-    /* Slightly scale up the cell on hover for a nice interactive effect */
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: add a shadow effect on hover */
-}
+        body { 
+            font-family: Arial, sans-serif;
+            -webkit-text-size-adjust: 100%; /* Safari on iOS, Firefox for Android */
+            text-size-adjust: 100%; /* Default for browsers that support it */
+        }
+        .container { 
+            text-align: center; 
+            margin-top: 20px; 
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: calc(100% - 20px); /* Assuming 4 cells per row, subtract the gap */
+            height: 150px;
+            background-color: rgb(183, 45, 186);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #fff;
+            margin: 10px;
+            box-sizing: border-box;
+            transition: transform 0.2s;
+        }
+        .cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
         .cell.correct { background-color: rgb(36, 232, 6); }
         .cell.incorrect {
             background-color: rgb(224, 33, 75);
@@ -637,10 +633,6 @@ window.onload = function() {
             updateScore();
         };
 </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialization code here
-    });
-    </script>
+   
 </body>
 </html>
